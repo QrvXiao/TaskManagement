@@ -1,0 +1,40 @@
+<h2>{{ isEdit ? 'Edit Task' : 'New Task' }}</h2>
+
+<form #taskForm="ngForm" (ngSubmit)="saveTask(taskForm)">
+  <div class="form-row">
+    <label for="title">Title</label>
+    <input id="title" [(ngModel)]="task.title" name="title" required minlength="1" #title="ngModel" />
+    <div *ngIf="title.invalid && title.touched" class="error">Title 必填</div>
+  </div>
+
+  <div class="form-row">
+    <label for="description">Description</label>
+    <textarea id="description" [(ngModel)]="task.description" name="description"></textarea>
+  </div>
+
+  <div class="form-row">
+    <label for="status">Status</label>
+    <select id="status" [(ngModel)]="task.status" name="status" required>
+      <option value="todo">To Do</option>
+      <option value="in-progress">In Progress</option>
+      <option value="done">Done</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label for="assignee">Assignee</label>
+    <input id="assignee" [(ngModel)]="task.assignee" name="assignee" />
+  </div>
+
+  <div class="form-row">
+    <label for="dueDate">Due Date</label>
+    <input id="dueDate" type="date" [(ngModel)]="task.dueDate" name="dueDate" />
+  </div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div class="form-actions">
+    <button type="submit" [disabled]="taskForm.invalid || saving">{{ saving ? 'Saving...' : 'Save' }}</button>
+    <button type="button" (click)="cancel()">Cancel</button>
+  </div>
+</form>

@@ -1,0 +1,14 @@
+<h2>Task Detail</h2>
+<div *ngIf="task; else notFound">
+  <p><strong>Title:</strong> {{ task.title }}</p>
+  <p><strong>Description:</strong> {{ task.description }}</p>
+  <p><strong>Status:</strong> {{ task.status }}</p>
+  <p><strong>Assignee:</strong> {{ task.assignee }}</p>
+  <p><strong>Due Date:</strong> {{ task.dueDate }}</p>
+  <button (click)="edit()">Edit</button>
+  <button (click)="back()">Back</button>
+</div>
+<ng-template #notFound>
+  <p>Task not found.</p>
+  <button (click)="back()">Back</button>
+</ng-template>
