@@ -6,8 +6,12 @@
     "start": "ng serve",
     "dev": "concurrently \"npm:start\" \"npm --prefix backend start\"",
     "build": "ng build",
+    "build:prod": "ng build --configuration production",
+    "deploy:vercel": "vercel --prod",
+    "deploy:backend": "echo 'Backend deployed via Render webhook'",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless",    
     "serve:ssr:task-management": "node dist/task-management/server/server.mjs"
   },
   "prettier": {

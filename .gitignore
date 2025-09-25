@@ -44,4 +44,3 @@ Thumbs.db
 /backend/.env
 /backend/node_modules
 /src/node_modules
-/src/environments/environment.ts
