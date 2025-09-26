@@ -24,19 +24,35 @@ router.post('/register', async (req, res) => {
 });
 
 // login
-router.post('/login', async (req, res) => {
+router.post('/register', async (req, res) => {
   try {
+    console.log('Register attempt:', { username: req.body.username, hasPassword: !!req.body.password });
+    
     const { username, password } = req.body;
-    const u = await User.findOne({ username });
-    if (!u) return res.status(401).json({ error: 'invalid credentials' });
-    const ok = await bcrypt.compare(password, u.passwordHash);
-    if (!ok) return res.status(401).json({ error: 'invalid credentials' });
-    const token = jwt.sign({ sub: u._id, username: u.username }, JWT_SECRET, { expiresIn: '8h' });
-    res.json({ token, user: { id: u._id, username: u.username } });
+    if (!username || !password) {
+      console.log('Missing credentials');
+      return res.status(400).json({ error: 'username and password required' });
+    }
+    
+    console.log('Checking existing user...');
+    const existing = await User.findOne({ username });
+    if (existing) {
+      console.log('Username already taken:', username);
+      return res.status(409).json({ error: 'username taken' });
+    }
+    
+    console.log('Hashing password...');
+    const passwordHash = await bcrypt.hash(password, 10);
+    
+    console.log('Creating user...');
+    const u = new User({ username, passwordHash });
+    await u.save();
+    
+    console.log('User created successfully:', u.username);
+    res.status(201).json({ username: u.username, id: u._id });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'login failed' });
+    console.error('Register error:', err);
+    res.status(500).json({ error: 'register failed' });
   }
-});
 
 module.exports = router;
