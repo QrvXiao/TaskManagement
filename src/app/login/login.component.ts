@@ -9,122 +9,87 @@ import { AuthService } from '../auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="login-container">
-      <h2>{{ mode === 'login' ? 'Login' : 'Register' }}</h2>
-      <div class="form-container" [class.disabled]="loading">
-        <input 
-          #usernameInput
-          [(ngModel)]="username" 
-          placeholder="username"
-          [disabled]="loading"
-          (keyup.enter)="onEnter()" />
-        <input 
-          #passwordInput
-          [(ngModel)]="password" 
-          type="password" 
-          placeholder="password"
-          [disabled]="loading"
-          (keyup.enter)="onEnter()" />
-        <div *ngIf="error" class="error">{{ error }}</div>
-        <div *ngIf="loading" class="loading">Processing...</div>
-        <button 
-          (click)="submitForm()"
-          [disabled]="!isFormValid() || loading">
-          {{ loading ? 'Processing...' : (mode === 'login' ? 'Login' : 'Register') }}
-        </button>
-      </div>
-      <p>
-        <a (click)="toggle()" [class.disabled]="loading" style="cursor: pointer;">
-          {{ mode === 'login' ? 'Need an account? Register' : 'Have an account? Login' }}
-        </a>
-      </p>
-    </div>
+    <h2>{{ mode === 'login' ? 'Login' : 'Register' }}</h2>
+    <form #f="ngForm" (ngSubmit)="submit($event, f)" [class.disabled]="loading">
+      <input 
+        name="username" 
+        [(ngModel)]="username" 
+        required 
+        placeholder="username"
+        [disabled]="loading" />
+      <input 
+        name="password" 
+        [(ngModel)]="password" 
+        required 
+        type="password" 
+        placeholder="password"
+        [disabled]="loading" />
+      <div *ngIf="error" class="error">{{ error }}</div>
+      <div *ngIf="loading" class="loading">Processing...</div>
+      <button 
+        type="submit" 
+        [disabled]="!f.valid || loading">
+        {{ loading ? 'Processing...' : (mode === 'login' ? 'Login' : 'Register') }}
+      </button>
+    </form>
+    <p>
+      <a (click)="toggle()" [class.disabled]="loading" style="cursor: pointer;">
+        {{ mode === 'login' ? 'Need an account? Register' : 'Have an account? Login' }}
+      </a>
+    </p>
   `,
   styles: [`
-    .login-container {
-      max-width: 400px;
-      margin: 50px auto;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .form-container {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
     .error {
-      color: #d32f2f;
+      color: red;
       margin: 10px 0;
-      padding: 12px;
-      border: 1px solid #d32f2f;
+      padding: 8px;
+      border: 1px solid red;
       background-color: #ffeaea;
       border-radius: 4px;
-      font-weight: 500;
     }
     .loading {
-      color: #1976d2;
+      color: blue;
       margin: 10px 0;
-      padding: 12px;
-      background-color: #e3f2fd;
+      padding: 8px;
+      background-color: #e6f3ff;
       border-radius: 4px;
-      text-align: center;
     }
     .disabled {
       pointer-events: none;
       opacity: 0.6;
     }
+    form.disabled input, form.disabled button {
+      pointer-events: none;
+    }
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
     input {
       width: 100%;
-      padding: 12px;
+      padding: 8px;
+      margin: 8px 0;
       border: 1px solid #ddd;
       border-radius: 4px;
       box-sizing: border-box;
-      font-size: 16px;
-    }
-    input:focus {
-      outline: none;
-      border-color: #1976d2;
-      box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
-    }
-    input:disabled {
-      background-color: #f5f5f5;
-      cursor: not-allowed;
     }
     button {
       width: 100%;
-      padding: 12px;
-      background-color: #1976d2;
+      padding: 10px;
+      margin: 10px 0;
+      background-color: #007bff;
       color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 16px;
-      font-weight: 500;
     }
     button:disabled {
       background-color: #ccc;
       cursor: not-allowed;
     }
     button:hover:not(:disabled) {
-      background-color: #1565c0;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 30px;
-      color: #333;
-    }
-    a {
-      text-decoration: none;
-      color: #1976d2;
-      font-size: 14px;
-      text-align: center;
-      display: block;
-      margin-top: 20px;
-    }
-    a:hover:not(.disabled) {
-      text-decoration: underline;
+      background-color: #0056b3;
     }
   `]
 })
@@ -137,24 +102,17 @@ export class LoginComponent {
 
   constructor(private auth: AuthService, private router: Router) {}
 
-  isFormValid(): boolean {
-    return this.username.trim().length > 0 && this.password.trim().length > 0;
-  }
-
-  onEnter() {
-    if (this.isFormValid() && !this.loading) {
-      this.submitForm();
-    }
-  }
-
   toggle() {
     if (this.loading) return;
     this.mode = this.mode === 'login' ? 'register' : 'login';
     this.error = '';
   }
 
-  submitForm() {
-    if (!this.isFormValid() || this.loading) return;
+  submit(event: Event, form: any) {
+    // 阻止表单默认提交行为
+    event.preventDefault();
+    
+    if (!form.valid || this.loading) return;
     
     this.loading = true;
     this.error = '';
