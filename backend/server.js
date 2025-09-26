@@ -13,6 +13,15 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use('/auth', authRouter);
 
+// ID 格式验证中间件
+function validateObjectId(req, res, next) {
+  const { id } = req.params;
+  if (id && !mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: 'Invalid ID format' });
+  }
+  next();
+}
+
 // 验证 token 中间件
 function requireAuth(req, res, next) {
   const auth = req.headers.authorization;
@@ -80,7 +89,6 @@ app.post('/tasks', requireAuth, async (req, res) => {
   try {
     const payload = { ...req.body };
     if (payload.dueDate) {
-      // 支持 yyyy-MM-dd 或 ISO 字符串
       payload.dueDate = new Date(payload.dueDate);
       if (isNaN(payload.dueDate.getTime())) {
         return res.status(400).json({ message: 'Invalid dueDate' });
@@ -109,39 +117,42 @@ app.get('/tasks', async (req, res) => {
   }
 });
 
-app.get('/tasks/:id', async (req, res) => {
+app.get('/tasks/:id', validateObjectId, async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
     if (task) res.json(task);
-    else res.status(404).json({ error: 'Not found' });
+    else res.status(404).json({ error: 'Task not found' });
   } catch (err) {
-    console.error(err);
-    res.status(400).json({ error: 'Invalid ID' });
+    console.error('Error fetching task:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-app.delete('/tasks/:id', requireAuth, async (req, res) => {
+app.delete('/tasks/:id', requireAuth, validateObjectId, async (req, res) => {
   try {
-    await Task.findByIdAndDelete(req.params.id);
-    res.sendStatus(204);
+    const task = await Task.findByIdAndDelete(req.params.id);
+    if (task) res.status(204).send();
+    else res.status(404).json({ error: 'Task not found' });
   } catch (err) {
-    console.error(err);
-    res.status(400).json({ error: 'Invalid ID' });
+    console.error('Error deleting task:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 
 // 更新任务（使用校验）
-app.put('/tasks/:id', requireAuth, async (req, res) => {
+app.put('/tasks/:id', requireAuth, validateObjectId, async (req, res) => {
   try {
     const update = { ...req.body };
-    if (update.dueDate) update.dueDate = new Date(update.dueDate);
+    if (update.dueDate) {
+      update.dueDate = new Date(update.dueDate);
+    }
     const task = await Task.findByIdAndUpdate(req.params.id, update, { new: true });
     if (task) res.json(task);
-    else res.status(404).send('Not found');
+    else res.status(404).json({ error: 'Task not found' });
   } catch (err) {
-    console.error(err);
-    res.status(400).json({ error: 'Invalid ID or bad data' });
+    console.error('Error updating task:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
