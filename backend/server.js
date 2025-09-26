@@ -49,7 +49,8 @@ const taskSchema = new mongoose.Schema({
   description: String,
   status: { type: String, enum: ['todo', 'in-progress', 'done'], default: 'todo' },
   assignee: String,
-  dueDate: Date
+  dueDate: Date,
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 }, { timestamps: true });
 
 taskSchema.set('toJSON', {
@@ -87,7 +88,10 @@ function validateTask(req, res, next) {
 
 app.post('/tasks', requireAuth, async (req, res) => {
   try {
-    const payload = { ...req.body };
+    const payload = { 
+      ...req.body,
+      userId: req.user.sub // 从 JWT token 中获取用户 ID
+    };
     if (payload.dueDate) {
       payload.dueDate = new Date(payload.dueDate);
       if (isNaN(payload.dueDate.getTime())) {
@@ -98,18 +102,17 @@ app.post('/tasks', requireAuth, async (req, res) => {
     }
     const task = new Task(payload);
     await task.save();
-    res.json(task); // toJSON transform 会把 _id->id，dueDate->ISO
+    res.json(task);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Create task failed' });
   }
 });
 
-
-// 其余路由增加错误处理
-app.get('/tasks', async (req, res) => {
+// 获取任务列表 - 只返回当前用户的任务
+app.get('/tasks', requireAuth, async (req, res) => {
   try {
-    const tasks = await Task.find();
+    const tasks = await Task.find({ userId: req.user.sub }); // 只查询当前用户的任务
     res.json(tasks);
   } catch (err) {
     console.error(err);
@@ -117,9 +120,13 @@ app.get('/tasks', async (req, res) => {
   }
 });
 
-app.get('/tasks/:id', validateObjectId, async (req, res) => {
+// 获取单个任务 - 验证所有权
+app.get('/tasks/:id', requireAuth, validateObjectId, async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findOne({ 
+      _id: req.params.id, 
+      userId: req.user.sub // 确保任务属于当前用户
+    });
     if (task) res.json(task);
     else res.status(404).json({ error: 'Task not found' });
   } catch (err) {
@@ -128,30 +135,41 @@ app.get('/tasks/:id', validateObjectId, async (req, res) => {
   }
 });
 
-app.delete('/tasks/:id', requireAuth, validateObjectId, async (req, res) => {
-  try {
-    const task = await Task.findByIdAndDelete(req.params.id);
-    if (task) res.status(204).send();
-    else res.status(404).json({ error: 'Task not found' });
-  } catch (err) {
-    console.error('Error deleting task:', err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-
-// 更新任务（使用校验）
+// 更新任务 - 验证所有权
 app.put('/tasks/:id', requireAuth, validateObjectId, async (req, res) => {
   try {
     const update = { ...req.body };
+    delete update.userId; // 防止用户修改 userId
+    
     if (update.dueDate) {
       update.dueDate = new Date(update.dueDate);
     }
-    const task = await Task.findByIdAndUpdate(req.params.id, update, { new: true });
+    
+    const task = await Task.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.sub }, // 确保任务属于当前用户
+      update, 
+      { new: true }
+    );
+    
     if (task) res.json(task);
     else res.status(404).json({ error: 'Task not found' });
   } catch (err) {
     console.error('Error updating task:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// 删除任务 - 验证所有权
+app.delete('/tasks/:id', requireAuth, validateObjectId, async (req, res) => {
+  try {
+    const task = await Task.findOneAndDelete({ 
+      _id: req.params.id, 
+      userId: req.user.sub // 确保任务属于当前用户
+    });
+    if (task) res.status(204).send();
+    else res.status(404).json({ error: 'Task not found' });
+  } catch (err) {
+    console.error('Error deleting task:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
