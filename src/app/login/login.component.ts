@@ -10,7 +10,7 @@ import { AuthService } from '../auth.service';
   imports: [CommonModule, FormsModule],
   template: `
     <h2>{{ mode === 'login' ? 'Login' : 'Register' }}</h2>
-    <form #f="ngForm" (ngSubmit)="submit(f)" [class.disabled]="loading">
+    <form #f="ngForm" (ngSubmit)="submit($event, f)" [class.disabled]="loading">
       <input 
         name="username" 
         [(ngModel)]="username" 
@@ -33,7 +33,7 @@ import { AuthService } from '../auth.service';
       </button>
     </form>
     <p>
-      <a (click)="toggle()" [class.disabled]="loading">
+      <a (click)="toggle()" [class.disabled]="loading" style="cursor: pointer;">
         {{ mode === 'login' ? 'Need an account? Register' : 'Have an account? Login' }}
       </a>
     </p>
@@ -45,10 +45,14 @@ import { AuthService } from '../auth.service';
       padding: 8px;
       border: 1px solid red;
       background-color: #ffeaea;
+      border-radius: 4px;
     }
     .loading {
       color: blue;
       margin: 10px 0;
+      padding: 8px;
+      background-color: #e6f3ff;
+      border-radius: 4px;
     }
     .disabled {
       pointer-events: none;
@@ -56,6 +60,36 @@ import { AuthService } from '../auth.service';
     }
     form.disabled input, form.disabled button {
       pointer-events: none;
+    }
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) {
+      background-color: #0056b3;
     }
   `]
 })
@@ -69,12 +103,15 @@ export class LoginComponent {
   constructor(private auth: AuthService, private router: Router) {}
 
   toggle() {
-    if (this.loading) return; // 防止在加载时切换模式
+    if (this.loading) return;
     this.mode = this.mode === 'login' ? 'register' : 'login';
     this.error = '';
   }
 
-  submit(form: any) {
+  submit(event: Event, form: any) {
+    // 阻止表单默认提交行为
+    event.preventDefault();
+    
     if (!form.valid || this.loading) return;
     
     this.loading = true;
@@ -109,7 +146,7 @@ export class LoginComponent {
         error: (e) => {
           this.loading = false;
           this.error = e?.error?.error || '登录失败';
-          console.error('Login error:', e); // 调试用
+          console.error('Login error:', e);
         }
       });
     }
