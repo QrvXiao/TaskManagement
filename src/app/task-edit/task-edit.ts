@@ -1,6 +1,7 @@
 // ...existing code...
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TaskService } from '../task.service';
 import { Task } from '../task.model';
@@ -8,7 +9,7 @@ import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-task-edit',
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './task-edit.html',
   styleUrl: './task-edit.scss'
 })
