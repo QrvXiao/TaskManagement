@@ -54,5 +54,6 @@ router.post('/register', async (req, res) => {
     console.error('Register error:', err);
     res.status(500).json({ error: 'register failed' });
   }
+});
 
 module.exports = router;
