@@ -20,7 +20,6 @@ export class TaskList implements OnInit {
 
   ngOnInit(): void {
     this.loadTasks();
-    // 可选：从编辑/详情返回后刷新列表
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
       this.loadTasks();
     });
@@ -30,16 +29,62 @@ export class TaskList implements OnInit {
     this.loading = true;
     this.error = '';
     this.taskService.getTasks().subscribe({
-      next: tasks => { this.tasks = tasks; this.loading = false; },
-      error: err => { this.error = err?.error?.error || 'Failed to load tasks'; this.loading = false; }
+      next: tasks => { 
+        this.tasks = tasks; 
+        this.loading = false; 
+      },
+      error: err => { 
+        this.error = err?.error?.error || 'Failed to load tasks'; 
+        this.loading = false; 
+      }
     });
   }
 
+  getTasksByStatus(status: string): Task[] {
+    return this.tasks.filter(task => task.status === status);
+  }
+
+  getStatusIcon(status: string): string {
+    switch (status) {
+      case 'todo': return '📝';
+      case 'in-progress': return '⚡';
+      case 'done': return '✅';
+      default: return '📝';
+    }
+  }
+
+  getStatusText(status: string): string {
+    switch (status) {
+      case 'todo': return 'To Do';
+      case 'in-progress': return 'In Progress';
+      case 'done': return 'Done';
+      default: return status;
+    }
+  }
+
+  formatDate(dateString: string | null): string {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric'
+      });
+    } catch {
+      return '';
+    }
+  }
+
+  trackByTaskId(index: number, task: Task): string {
+    return task.id || index.toString();
+  }
+
   confirmDelete(id: string) {
-    if (!confirm('确定要删除此任务吗？')) return;
+    if (!confirm('Are you sure you want to delete this task?')) return;
     this.taskService.deleteTask(id).subscribe({
       next: () => this.loadTasks(),
-      error: err => alert(err?.error?.error || '删除失败')
+      error: err => alert(err?.error?.error || 'Delete failed')
     });
   }
 
@@ -56,8 +101,10 @@ export class TaskList implements OnInit {
   }
 
   deleteTask(id: string) {
-    this.taskService.deleteTask(id).subscribe(() => {
-      this.loadTasks(); // 删除任务后刷新列表
-    });
+    if (confirm('Are you sure you want to delete this task?')) {
+      this.taskService.deleteTask(id).subscribe(() => {
+        this.loadTasks();
+      });
+    }
   }
 }

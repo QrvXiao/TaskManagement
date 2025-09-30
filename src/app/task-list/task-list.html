@@ -1,12 +1,91 @@
-<h2>Task List</h2>
-<button (click)="newTask()">New Task</button>
-<div *ngIf="loading">Loading...</div>
-<div *ngIf="error" class="error">{{ error }}</div>
-<ul>
-  <li *ngFor="let task of tasks">
-    <strong>{{ task.title }}</strong> - {{ task.status }}
-    <button (click)="viewTask(task.id!)">View</button>
-    <button (click)="editTask(task.id!)">Edit</button>
-    <button (click)="deleteTask(task.id!)">Delete</button>
-  </li>
-</ul>
+<div class="task-list-container fade-in">
+  <div class="page-header">
+    <div class="header-content">
+      <h2 class="page-title">
+        <i class="icon">📋</i>
+        My Tasks
+      </h2>
+      <button (click)="newTask()" class="btn btn-primary">
+        <i class="icon">➕</i>
+        New Task
+      </button>
+    </div>
+    <div class="task-stats">
+      <div class="stat-item">
+        <span class="stat-number">{{ tasks.length }}</span>
+        <span class="stat-label">Total</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ getTasksByStatus('todo').length }}</span>
+        <span class="stat-label">To Do</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ getTasksByStatus('in-progress').length }}</span>
+        <span class="stat-label">In Progress</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ getTasksByStatus('done').length }}</span>
+        <span class="stat-label">Done</span>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading your tasks...</p>
+  </div>
+
+  <div *ngIf="error" class="error">
+    <i class="icon">⚠️</i>
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error" class="tasks-grid">
+    <div *ngFor="let task of tasks; trackBy: trackByTaskId" class="task-card">
+      <div class="task-header">
+        <h3 class="task-title">{{ task.title }}</h3>
+        <span class="status-badge" [ngClass]="'status-' + task.status">
+          {{ getStatusIcon(task.status) }} {{ getStatusText(task.status) }}
+        </span>
+      </div>
+      
+      <p class="task-description">{{ task.description || 'No description' }}</p>
+      
+      <div class="task-meta">
+        <div *ngIf="task.assignee" class="meta-item">
+          <i class="icon">👤</i>
+          <span>{{ task.assignee }}</span>
+        </div>
+        <div *ngIf="task.dueDate" class="meta-item">
+          <i class="icon">📅</i>
+          <span>{{ formatDate(task.dueDate) }}</span>
+        </div>
+      </div>
+      
+      <div class="task-actions">
+        <button (click)="viewTask(task.id!)" class="btn btn-secondary btn-sm">
+          <i class="icon">👁️</i>
+          View
+        </button>
+        <button (click)="editTask(task.id!)" class="btn btn-primary btn-sm">
+          <i class="icon">✏️</i>
+          Edit
+        </button>
+        <button (click)="deleteTask(task.id!)" class="btn btn-danger btn-sm">
+          <i class="icon">🗑️</i>
+          Delete
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="tasks.length === 0" class="empty-state">
+      <div class="empty-icon">📝</div>
+      <h3>No tasks yet</h3>
+      <p>Create your first task to get started!</p>
+      <button (click)="newTask()" class="btn btn-primary">
+        <i class="icon">➕</i>
+        Create First Task
+      </button>
+    </div>
+  </div>
+</div>

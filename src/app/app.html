@@ -1,9 +1,35 @@
-<header class="app-header">
-  <h1>{{ title() }}</h1>
-  <div class="auth">
-    <button *ngIf="logged" (click)="logout()">Logout</button>
-    <a *ngIf="!logged" href="/login">Login</a>
-  </div>
-</header>
+<div class="app-wrapper">
+  <header class="app-header">
+    <div class="container">
+      <div class="header-content">
+        <h1 class="app-title">
+          <i class="icon">📋</i>
+          {{ title() }}
+        </h1>
+        <nav class="nav-actions">
+          <span *ngIf="logged" class="welcome-text">
+            Welcome back! 👋
+          </span>
+          <button *ngIf="logged" (click)="logout()" class="btn btn-secondary">
+            <i class="icon">🚪</i> Logout
+          </button>
+          <a *ngIf="!logged" href="/login" class="btn btn-primary">
+            <i class="icon">🔐</i> Login
+          </a>
+        </nav>
+      </div>
+    </div>
+  </header>
 
-<router-outlet />
+  <main class="app-main">
+    <div class="container">
+      <router-outlet />
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">
+      <p>&copy; 2024 Task Management System. Built with Angular & Node.js</p>
+    </div>
+  </footer>
+</div>
