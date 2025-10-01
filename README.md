@@ -4,7 +4,7 @@ A modern, full-stack task management application built with Angular and Node.js,
 
 ## 🚀 Live Demo
 
-- **Frontend**: [https://your-vercel-app.vercel.app](https://your-vercel-app.vercel.app)
+- **Frontend**: [https://task-management-drab-one.vercel.app/login](https://task-management-drab-one.vercel.app/login)
 - **Backend API**: [https://taskmanagement-zzum.onrender.com](https://taskmanagement-zzum.onrender.com)
 
 ## 📋 Project Overview
