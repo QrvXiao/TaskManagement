@@ -137,12 +137,13 @@ This project demonstrates a complete full-stack web application with modern deve
 *Modern task management dashboard with statistics and card-based layout*
 
 ### Task Creation
-<img src="screenshot/create-page.png" alt="Task Form" width="600">
+<img src="screenshot/create-page.png" alt="Task Form" width="400" height="300">
 
 *Intuitive task creation form with validation and date picker*
 
 ### Authentication
 ![Login Page](screenshot/login.png)
+
 *Clean authentication interface with form validation*
 
 ## 🔧 API Documentation
