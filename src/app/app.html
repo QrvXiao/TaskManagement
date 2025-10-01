@@ -10,7 +10,7 @@
           <!-- 只有在认证状态已初始化后才显示按钮 -->
           <div *ngIf="authInitialized; else loadingAuth">
             <span *ngIf="logged" class="welcome-text">
-              Welcome back! 👋
+              Welcome back, <strong>{{ getDisplayName() }}</strong>! 👋
             </span>
             <button *ngIf="logged" (click)="logout()" class="btn btn-secondary">
               <i class="icon">🚪</i> Logout

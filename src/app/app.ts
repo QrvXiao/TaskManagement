@@ -23,6 +23,16 @@ export class App {
     return this.auth.isInitialized();
   }
 
+  get currentUser() {
+    return this.auth.currentUser();
+  }
+
+  // 获取显示用的用户名
+  getDisplayName(): string {
+    const user = this.currentUser;
+    return user?.username || 'User';
+  }
+
   logout() {
     this.auth.logout();
     this.router.navigate(['/login']);
