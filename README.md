@@ -96,7 +96,7 @@ This project demonstrates a complete full-stack web application with modern deve
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/task-management.git
+   git clone https://github.com/QrvXiao/TaskManagement.git
    cd task-management
    ```
 
