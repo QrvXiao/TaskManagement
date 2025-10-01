@@ -19,6 +19,10 @@ export class App {
     return this.auth.isLogged();
   }
 
+  get authInitialized() {
+    return this.auth.isInitialized();
+  }
+
   logout() {
     this.auth.logout();
     this.router.navigate(['/login']);

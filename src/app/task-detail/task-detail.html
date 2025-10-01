@@ -1,14 +1,70 @@
-<h2>Task Detail</h2>
-<div *ngIf="task; else notFound">
-  <p><strong>Title:</strong> {{ task.title }}</p>
-  <p><strong>Description:</strong> {{ task.description }}</p>
-  <p><strong>Status:</strong> {{ task.status }}</p>
-  <p><strong>Assignee:</strong> {{ task.assignee }}</p>
-  <p><strong>Due Date:</strong> {{ task.dueDate }}</p>
-  <button (click)="edit()">Edit</button>
-  <button (click)="back()">Back</button>
+<div class="task-detail-container fade-in">
+  <div class="detail-card" *ngIf="task; else notFound">
+    <div class="detail-header">
+      <div class="header-icon">📋</div>
+      <h2 class="detail-title">{{ task.title }}</h2>
+      <span class="status-badge" [ngClass]="'status-' + task.status">
+        {{ getStatusIcon(task.status) }} {{ getStatusText(task.status) }}
+      </span>
+    </div>
+
+    <div class="detail-content">
+      <div class="detail-section" *ngIf="task.description">
+        <h3 class="section-title">
+          <i class="icon">📄</i> Description
+        </h3>
+        <p class="section-content">{{ task.description }}</p>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-item" *ngIf="task.assignee">
+          <span class="item-label">
+            <i class="icon">👤</i> Assignee
+          </span>
+          <span class="item-value">{{ task.assignee }}</span>
+        </div>
+
+        <div class="detail-item" *ngIf="task.dueDate">
+          <span class="item-label">
+            <i class="icon">📅</i> Due Date
+          </span>
+          <span class="item-value">{{ formatDate(task.dueDate) }}</span>
+        </div>
+
+        <div class="detail-item" *ngIf="task.createdAt">
+          <span class="item-label">
+            <i class="icon">🕐</i> Created
+          </span>
+          <span class="item-value">{{ formatDate(task.createdAt) }}</span>
+        </div>
+
+        <div class="detail-item" *ngIf="task.updatedAt">
+          <span class="item-label">
+            <i class="icon">🔄</i> Updated
+          </span>
+          <span class="item-value">{{ formatDate(task.updatedAt) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-actions">
+      <button (click)="edit()" class="btn btn-primary">
+        <i class="icon">✏️</i> Edit Task
+      </button>
+      <button (click)="back()" class="btn btn-secondary">
+        <i class="icon">↩️</i> Back to List
+      </button>
+    </div>
+  </div>
+
+  <ng-template #notFound>
+    <div class="not-found-card">
+      <div class="not-found-icon">😕</div>
+      <h3>Task Not Found</h3>
+      <p>The task you're looking for doesn't exist or has been deleted.</p>
+      <button (click)="back()" class="btn btn-primary">
+        <i class="icon">↩️</i> Back to List
+      </button>
+    </div>
+  </ng-template>
 </div>
-<ng-template #notFound>
-  <p>Task not found.</p>
-  <button (click)="back()">Back</button>
-</ng-template>

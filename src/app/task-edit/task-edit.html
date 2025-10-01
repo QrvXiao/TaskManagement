@@ -1,40 +1,126 @@
-<h2>{{ isEdit ? 'Edit Task' : 'New Task' }}</h2>
+<div class="task-edit-container fade-in">
+  <div class="edit-card">
+    <div class="edit-header">
+      <div class="header-icon">
+        {{ isEdit ? '✏️' : '➕' }}
+      </div>
+      <h2 class="edit-title">{{ isEdit ? 'Edit Task' : 'Create New Task' }}</h2>
+      <p class="edit-subtitle">
+        {{ isEdit ? 'Update your task details' : 'Fill in the details for your new task' }}
+      </p>
+    </div>
 
-<form #taskForm="ngForm" (ngSubmit)="saveTask(taskForm)">
-  <div class="form-row">
-    <label for="title">Title</label>
-    <input id="title" [(ngModel)]="task.title" name="title" required minlength="1" #title="ngModel" />
-    <div *ngIf="title.invalid && title.touched" class="error">Title 必填</div>
+    <form #taskForm="ngForm" (ngSubmit)="saveTask(taskForm)" class="task-form" [class.disabled]="saving">
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label class="form-label" for="title">
+            <i class="icon">📝</i> Task Title *
+          </label>
+          <input 
+            id="title" 
+            [(ngModel)]="task.title" 
+            name="title" 
+            required 
+            minlength="1" 
+            #title="ngModel"
+            class="form-control"
+            placeholder="Enter a descriptive title"
+            [disabled]="saving" />
+          <div *ngIf="title.invalid && title.touched" class="field-error">
+            <i class="icon">⚠️</i> Title is required
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label class="form-label" for="description">
+            <i class="icon">📄</i> Description
+          </label>
+          <textarea 
+            id="description" 
+            [(ngModel)]="task.description" 
+            name="description"
+            class="form-control textarea"
+            placeholder="Add a detailed description (optional)"
+            rows="4"
+            [disabled]="saving"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="status">
+            <i class="icon">🔄</i> Status *
+          </label>
+          <select 
+            id="status" 
+            [(ngModel)]="task.status" 
+            name="status" 
+            required
+            class="form-control"
+            [disabled]="saving">
+            <option value="todo">📝 To Do</option>
+            <option value="in-progress">⚡ In Progress</option>
+            <option value="done">✅ Done</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="assignee">
+            <i class="icon">👤</i> Assignee
+          </label>
+          <input 
+            id="assignee" 
+            [(ngModel)]="task.assignee" 
+            name="assignee"
+            class="form-control"
+            placeholder="Who is responsible?"
+            [disabled]="saving" />
+        </div>
+
+        <div class="form-group full-width">
+          <label class="form-label" for="dueDate">
+            <i class="icon">📅</i> Due Date
+          </label>
+          <input 
+            id="dueDate" 
+            type="date" 
+            [(ngModel)]="task.dueDate" 
+            name="dueDate"
+            class="form-control"
+            [disabled]="saving" />
+        </div>
+      </div>
+
+      <div *ngIf="error" class="error">
+        <i class="icon">⚠️</i> {{ error }}
+      </div>
+
+      <div *ngIf="saving" class="saving-state">
+        <div class="spinner"></div>
+        <span>Saving your task...</span>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="btn btn-primary save-btn"
+          [disabled]="taskForm.invalid || saving">
+          <span *ngIf="!saving">
+            <i class="icon">{{ isEdit ? '💾' : '✨' }}</i>
+            {{ isEdit ? 'Update Task' : 'Create Task' }}
+          </span>
+          <span *ngIf="saving">
+            <div class="btn-spinner"></div>
+            Saving...
+          </span>
+        </button>
+        <button 
+          type="button" 
+          (click)="cancel()" 
+          class="btn btn-secondary cancel-btn"
+          [disabled]="saving">
+          <i class="icon">↩️</i>
+          Cancel
+        </button>
+      </div>
+    </form>
   </div>
-
-  <div class="form-row">
-    <label for="description">Description</label>
-    <textarea id="description" [(ngModel)]="task.description" name="description"></textarea>
-  </div>
-
-  <div class="form-row">
-    <label for="status">Status</label>
-    <select id="status" [(ngModel)]="task.status" name="status" required>
-      <option value="todo">To Do</option>
-      <option value="in-progress">In Progress</option>
-      <option value="done">Done</option>
-    </select>
-  </div>
-
-  <div class="form-row">
-    <label for="assignee">Assignee</label>
-    <input id="assignee" [(ngModel)]="task.assignee" name="assignee" />
-  </div>
-
-  <div class="form-row">
-    <label for="dueDate">Due Date</label>
-    <input id="dueDate" type="date" [(ngModel)]="task.dueDate" name="dueDate" />
-  </div>
-
-  <div *ngIf="error" class="error">{{ error }}</div>
-
-  <div class="form-actions">
-    <button type="submit" [disabled]="taskForm.invalid || saving">{{ saving ? 'Saving...' : 'Save' }}</button>
-    <button type="button" (click)="cancel()">Cancel</button>
-  </div>
-</form>
+</div>

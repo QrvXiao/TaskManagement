@@ -1,4 +1,3 @@
-// ...existing code...
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -43,19 +42,26 @@ export class TaskEdit implements OnInit {
             this.task.dueDate = null;
           }
         },
-        error: () => {
-          this.error = '加载任务失败';
+        error: (err) => {
+          this.error = err?.error?.error || 'Failed to load task';
+          console.error('Load task error:', err);
         }
       });
     } else {
       // 新建时设置默认值
-      this.task = { status: 'todo' };
+      this.task = { 
+        status: 'todo',
+        title: '',
+        description: '',
+        assignee: '',
+        dueDate: null
+      };
     }
   }
 
   saveTask(form: any): void {
     if (!form || !form.valid) {
-      this.error = '请完整填写表单';
+      this.error = 'Please fill in all required fields correctly';
       return;
     }
 
@@ -77,19 +83,34 @@ export class TaskEdit implements OnInit {
       : this.taskService.addTask(payload as Task);
 
     obs.subscribe({
-      next: () => {
+      next: (savedTask) => {
         this.saving = false;
+        console.log('Task saved successfully:', savedTask);
         this.router.navigate(['/']);
       },
-      error: () => {
+      error: (err) => {
         this.saving = false;
-        this.error = '保存失败，请稍后重试';
+        this.error = err?.error?.error || 'Save failed, please try again';
+        console.error('Save task error:', err);
       }
     });
   }
 
   cancel(): void {
-    this.router.navigate(['/']);
+    if (this.saving) return;
+    
+    // 如果表单有未保存的更改，询问用户确认
+    if (this.hasUnsavedChanges()) {
+      if (confirm('You have unsaved changes. Are you sure you want to leave?')) {
+        this.router.navigate(['/']);
+      }
+    } else {
+      this.router.navigate(['/']);
+    }
+  }
+
+  private hasUnsavedChanges(): boolean {
+    // 简单检查是否有内容
+    return !!(this.task.title || this.task.description || this.task.assignee || this.task.dueDate);
   }
 }
-// ...existing code...

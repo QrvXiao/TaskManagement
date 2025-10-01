@@ -7,15 +7,23 @@
           {{ title() }}
         </h1>
         <nav class="nav-actions">
-          <span *ngIf="logged" class="welcome-text">
-            Welcome back! 👋
-          </span>
-          <button *ngIf="logged" (click)="logout()" class="btn btn-secondary">
-            <i class="icon">🚪</i> Logout
-          </button>
-          <a *ngIf="!logged" href="/login" class="btn btn-primary">
-            <i class="icon">🔐</i> Login
-          </a>
+          <!-- 只有在认证状态已初始化后才显示按钮 -->
+          <div *ngIf="authInitialized; else loadingAuth">
+            <span *ngIf="logged" class="welcome-text">
+              Welcome back! 👋
+            </span>
+            <button *ngIf="logged" (click)="logout()" class="btn btn-secondary">
+              <i class="icon">🚪</i> Logout
+            </button>
+            <a *ngIf="!logged" href="/login" class="btn btn-primary">
+              <i class="icon">🔐</i> Login
+            </a>
+          </div>
+          <ng-template #loadingAuth>
+            <div class="auth-loading">
+              <div class="loading-spinner"></div>
+            </div>
+          </ng-template>
         </nav>
       </div>
     </div>

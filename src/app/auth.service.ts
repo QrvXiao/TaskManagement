@@ -8,11 +8,18 @@ import { Observable, throwError } from 'rxjs';
 export class AuthService {
   private api = environment.apiUrl + '/auth';
   public isLogged = signal(false);
+  public isInitialized = signal(false); // 新增：是否已初始化
 
   constructor(private http: HttpClient) {
+    this.initializeAuth();
+  }
+
+  private initializeAuth() {
     if (typeof window !== 'undefined' && window?.localStorage) {
-      this.isLogged.set(!!localStorage.getItem('auth_token'));
+      const token = localStorage.getItem('auth_token');
+      this.isLogged.set(!!token);
     }
+    this.isInitialized.set(true); // 标记为已初始化
   }
 
   login(username: string, password: string): Observable<any> {
