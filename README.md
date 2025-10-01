@@ -301,11 +301,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Developer
 
-**Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
-- Portfolio: [yourportfolio.com](https://yourportfolio.com)
-- Email: your.email@gmail.com
+**Tianyang Xiao**
+- GitHub: [@QrvXiao]([https://github.com/yourusername](https://github.com/QrvXiao))
+- LinkedIn: [tianyang-xiao](https://www.linkedin.com/in/tianyang-xiao/)
+- Email: qravexiao@gmail.com
 
 ---
 
